@@ -1,35 +1,211 @@
-# 🧬 Quantum Breast Cancer Detection API
+# 🧬 Explainable Noise-Resilient Quantum Neural Networks for Breast Cancer Detection
 
-A Hybrid Classical-Quantum Neural Network for classifying mammogram images as **Benign** or **Malignant**.
+[![Python](https://img.shields.io/badge/Python-3.10-blue)](https://python.org)
+[![PennyLane](https://img.shields.io/badge/PennyLane-0.38.0-purple)](https://pennylane.ai)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.3.0-orange)](https://pytorch.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-green)](https://fastapi.tiangolo.com)
+[![Render](https://img.shields.io/badge/Deployed-Render-blue)](https://explainable-noise-resilient-quantum.onrender.com)
 
-## Architecture
-- **Backbone**: DenseNet121 (pretrained ImageNet)
-- **Quantum Layers**: 3 configs (Single Qubit, Entanglement, Full Variational)
-- **Framework**: PennyLane + PyTorch
+> **Dissertation Research Project** — Hybrid Classical-Quantum Neural Network for binary classification of mammogram images (Benign vs Malignant), with noise robustness analysis across three quantum circuit architectures.
 
-## API Endpoints
+🔗 **Live Demo:** [explainable-noise-resilient-quantum.onrender.com](https://explainable-noise-resilient-quantum.onrender.com)
+
+---
+
+## 📌 Research Motivation
+
+Standard CNNs classify breast cancer as a black box — they output a probability with no quantum interpretability. This project investigates whether **quantum circuits can extract meaningful diagnostic features** that classical neurons cannot, and whether **quantum expectation values ⟨Z⟩** carry physically interpretable information for medical imaging.
+
+The CNN (DenseNet121) serves as a **classical baseline** to measure quantum advantage against — not as competition.
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+Mammogram Image (224×224)
+        ↓
+DenseNet121 Backbone (pretrained ImageNet)
+        ↓
+Classical Feature Vector (1024-dim)
+        ↓
+Pre-Quantum Compression Layer (Linear → BatchNorm → ReLU → Tanh)
+        ↓
+┌──────────────────────────────────────────┐
+│         QUANTUM CIRCUIT LAYER            │
+│  Config 1: Single Qubit (RX+RY+RZ)       │
+│  Config 2: Entanglement Only (CNOT)      │
+│  Config 3: Full Variational (R+CNOT)     │
+└──────────────────────────────────────────┘
+        ↓
+Quantum Expectation Values ⟨Z⟩
+        ↓
+Post-Quantum Classifier + Bypass Connection
+        ↓
+Benign / Malignant
+```
+
+---
+
+## ⬡ Three Quantum Circuit Configurations
+
+### Config 1 — Single Qubit Rotational
+- **Qubits:** 1
+- **Gates:** RX + RY + RZ rotations only
+- **No entanglement**
+- **Q-params:** 6 (2 layers × 3 rotations)
+- **Purpose:** Baseline quantum — can single-qubit rotations alone add value?
+
+### Config 2 — Entanglement Only
+- **Qubits:** 4
+- **Gates:** Hadamard + PhaseShift + CNOT only
+- **No single-qubit rotations**
+- **Q-params:** 8 (scale + bias per qubit)
+- **Purpose:** Does quantum correlation (entanglement) alone carry diagnostic signal?
+
+### Config 3 — Full Variational
+- **Qubits:** 4
+- **Gates:** AngleEmbedding + RX + RY + RZ + CNOT
+- **Full hybrid circuit**
+- **Q-params:** 24 (2 layers × 4 qubits × 3 rotations)
+- **Purpose:** Maximum expressibility — rotations AND entanglement combined
+
+---
+
+## 🔬 Noise Robustness Analysis
+
+A key research contribution is testing model performance under **simulated quantum hardware noise**:
+
+| Noise Type | Description |
+|---|---|
+| `depolarizing` | Random Pauli error on each qubit |
+| `bit_flip` | \|0⟩ ↔ \|1⟩ with probability p |
+| `phase_flip` | Phase error: \|+⟩ ↔ \|−⟩ |
+| `amplitude_damping` | Energy dissipation (T1 decay) |
+
+**Noise levels tested:** p = 0.01, 0.05, 0.10
+
+This analysis proves the model's viability on **real near-term quantum hardware (NISQ devices)** where noise is unavoidable.
+
+---
+
+## 📊 What Makes This Different from a CNN?
+
+| Feature | DenseNet121 (Baseline) | This Model |
+|---|---|---|
+| Classification | ✅ Benign/Malignant | ✅ Benign/Malignant |
+| Interpretability | ❌ Black box probability | ✅ Quantum ⟨Z⟩ values |
+| Noise analysis | ❌ Not applicable | ✅ 4 noise types × 3 levels |
+| Circuit comparison | ❌ Single architecture | ✅ 3 quantum architectures |
+| Quantum advantage study | ❌ None | ✅ Core research question |
+| NISQ readiness | ❌ Not applicable | ✅ Noise resilience proven |
+
+---
+
+## 🚀 API Endpoints
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | API info |
-| GET | `/health` | Health check |
-| POST | `/predict` | Predict with all 3 models |
-| POST | `/predict/{model_name}` | Predict with one model |
+|---|---|---|
+| `GET` | `/` | Frontend website |
+| `GET` | `/health` | Health check + loaded models |
+| `POST` | `/predict` | Predict with all 3 models + ensemble |
+| `POST` | `/predict/{model_name}` | Predict with specific model |
+| `GET` | `/docs` | Interactive Swagger UI |
 
-### Model names
+### Model names for `/predict/{model_name}`:
 - `single_qubit`
 - `entanglement`
 - `full_variational`
 
-## Run Locally
-
-```bash
-pip install -r requirements.txt
-uvicorn app:app --reload
+### Example Response `/predict`:
+```json
+{
+  "filename": "mammogram.jpg",
+  "results": {
+    "single_qubit":     { "probability": 0.056, "prediction": "Benign", "confidence": 94.4 },
+    "entanglement":     { "probability": 0.069, "prediction": "Benign", "confidence": 93.1 },
+    "full_variational": { "probability": 0.154, "prediction": "Benign", "confidence": 84.6 },
+    "ensemble":         { "probability": 0.093, "prediction": "Benign", "confidence": 90.7 }
+  }
+}
 ```
 
-## Deploy on Render
-1. Push to GitHub
-2. Connect repo on render.com
-3. Set build command: `pip install -r requirements.txt`
-4. Set start command: `uvicorn app:app --host 0.0.0.0 --port $PORT`
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Quantum Framework | PennyLane 0.38 + Lightning.Qubit |
+| Classical Backbone | PyTorch + DenseNet121 (ImageNet) |
+| Quantum Interface | `diff_method="adjoint"` |
+| API Backend | FastAPI + Uvicorn |
+| Containerization | Docker |
+| Deployment | Render (Free tier) |
+| Training Platform | Kaggle (GPU) |
+
+---
+
+## 📁 Project Structure
+
+```
+quantum-api/
+├── app.py                      # FastAPI app + static serving
+├── quantum_models.py           # All quantum circuits + HybridModel
+├── requirements.txt            # Python dependencies
+├── Dockerfile                  # Container config
+├── static/
+│   └── index.html              # Frontend website
+└── models/
+    ├── single_qubit_best.pth       # Trained Config 1
+    ├── entanglement_best.pth       # Trained Config 2
+    └── full_variational_best.pth   # Trained Config 3
+```
+
+---
+
+## ⚙️ Run Locally
+
+```bash
+# Clone repo
+git clone https://github.com/YOUR_USERNAME/quantum-breast-cancer-api.git
+cd quantum-breast-cancer-api
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run server
+uvicorn app:app --reload
+
+# Open browser
+http://localhost:8000
+```
+
+---
+
+## 🏋️ Training Details
+
+| Parameter | Value |
+|---|---|
+| Dataset | CBIS-DDSM / VinDr-Mammo |
+| Image size | 224 × 224 |
+| Epochs | 20 (early stopping, patience=5) |
+| Optimizer | Adam (lr=1e-3, weight_decay=1e-4) |
+| Scheduler | ReduceLROnPlateau |
+| Loss | BCEWithLogitsLoss |
+| Backbone freeze | Epochs 1–4 frozen, unfrozen at epoch 5 |
+| Metric | ROC-AUC |
+| Platform | Kaggle GPU (Tesla P100) |
+
+---
+
+## ⚠️ Disclaimer
+
+This project is part of a dissertation on hybrid classical-quantum neural networks. All results are for **academic research only** and must not be used for clinical diagnosis or medical decision-making.
+
+---
+
+## 👨‍🎓 Author
+
+**Dissertation Project** — Hybrid Classical-Quantum Neural Networks for Medical Imaging  
+Submitted as part of MSc dissertation requirements.
