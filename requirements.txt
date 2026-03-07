@@ -1,0 +1,10 @@
+fastapi==0.111.0
+uvicorn==0.30.1
+torch==2.3.0
+torchvision==0.18.0
+pennylane==0.36.0
+pennylane-lightning==0.36.0
+Pillow==10.3.0
+numpy==1.26.4
+python-multipart==0.0.9
+scikit-learn==1.5.0

@@ -1,0 +1,35 @@
+# 🧬 Quantum Breast Cancer Detection API
+
+A Hybrid Classical-Quantum Neural Network for classifying mammogram images as **Benign** or **Malignant**.
+
+## Architecture
+- **Backbone**: DenseNet121 (pretrained ImageNet)
+- **Quantum Layers**: 3 configs (Single Qubit, Entanglement, Full Variational)
+- **Framework**: PennyLane + PyTorch
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | API info |
+| GET | `/health` | Health check |
+| POST | `/predict` | Predict with all 3 models |
+| POST | `/predict/{model_name}` | Predict with one model |
+
+### Model names
+- `single_qubit`
+- `entanglement`
+- `full_variational`
+
+## Run Locally
+
+```bash
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+
+## Deploy on Render
+1. Push to GitHub
+2. Connect repo on render.com
+3. Set build command: `pip install -r requirements.txt`
+4. Set start command: `uvicorn app:app --host 0.0.0.0 --port $PORT`
