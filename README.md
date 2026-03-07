@@ -4,9 +4,6 @@
 Hybrid Classical-Quantum Deep Learning System for Mammogram Classification
 </p>
 
-<p align="center">
-<img src="assets/demo.png" width="800">
-</p>
 
 ---
 
