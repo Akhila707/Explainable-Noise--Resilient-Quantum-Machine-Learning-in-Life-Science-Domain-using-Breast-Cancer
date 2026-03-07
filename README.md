@@ -215,5 +215,6 @@ This system is developed **only for academic research purposes** and should not 
 
 ## 👨‍💻 Author
 
+- P V Akhila , 
 MSc Data Science Dissertation
 Hybrid Classical-Quantum Neural Networks for Medical Imaging
