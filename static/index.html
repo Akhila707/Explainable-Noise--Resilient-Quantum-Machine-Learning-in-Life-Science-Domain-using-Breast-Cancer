@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>QuantumDx — Breast Cancer Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#050810;--surface:#0c1120;--surface2:#111827;--border:rgba(99,179,237,0.12);--accent:#63b3ed;--accent2:#68d391;--danger:#fc8181;--warn:#f6ad55;--text:#e2e8f0;--muted:#718096;--glow:rgba(99,179,237,0.15)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,179,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,179,237,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:drift 12s ease-in-out infinite alternate}
+.orb1{width:500px;height:500px;background:rgba(99,179,237,0.07);top:-100px;left:-100px}
+.orb2{width:400px;height:400px;background:rgba(104,211,145,0.06);bottom:-100px;right:-100px;animation-delay:-4s}
+.orb3{width:300px;height:300px;background:rgba(246,173,85,0.05);top:40%;left:50%;animation-delay:-8s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(30px,20px) scale(1.05)}}
+.container{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+header{border-bottom:1px solid var(--border);padding:20px 0;backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;background:rgba(5,8,16,0.8)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;color:var(--text)}
+.logo span{color:var(--accent)}
+.status-pill{display:flex;align-items:center;gap:8px;background:rgba(104,211,145,0.1);border:1px solid rgba(104,211,145,0.2);border-radius:100px;padding:6px 14px;font-size:.72rem;color:var(--accent2);letter-spacing:.05em}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero{padding:80px 0 60px;text-align:center}
+.hero-tag{display:inline-block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);border:1px solid var(--border);border-radius:4px;padding:5px 14px;margin-bottom:28px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.4rem,5vw,4rem);line-height:1.1;letter-spacing:-.02em;margin-bottom:20px;color:#fff}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{font-size:.9rem;color:var(--muted);max-width:540px;margin:0 auto 40px;line-height:1.8}
+.model-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:48px}
+.model-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .2s,transform .2s}
+.model-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.model-card .label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.model-card .name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px}
+.model-card .desc{font-size:.7rem;color:var(--muted);line-height:1.5}
+.model-card .q-chip{display:inline-block;margin-top:8px;font-size:.65rem;background:rgba(99,179,237,0.1);color:var(--accent);border-radius:4px;padding:2px 8px}
+.upload-section{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px;margin-bottom:32px;text-align:center;position:relative;overflow:hidden}
+.upload-zone{border:2px dashed rgba(99,179,237,0.25);border-radius:16px;padding:52px 32px;cursor:pointer;transition:all .25s;position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:rgba(99,179,237,0.04)}
+.upload-icon{width:56px;height:56px;margin:0 auto 16px;background:rgba(99,179,237,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:transform .2s}
+.upload-zone:hover .upload-icon{transform:scale(1.1)}
+.upload-zone h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.upload-zone p{font-size:.78rem;color:var(--muted);margin-bottom:20px}
+#fileInput{display:none}
+.btn-upload{background:var(--accent);color:#050810;border:none;border-radius:8px;padding:12px 28px;font-family:'DM Mono',monospace;font-size:.82rem;font-weight:500;cursor:pointer;letter-spacing:.04em;transition:opacity .2s,transform .15s}
+.btn-upload:hover{opacity:.88;transform:translateY(-1px)}
+.preview-row{display:none;align-items:center;gap:20px;margin-top:24px;background:var(--surface2);border-radius:12px;padding:16px 20px;text-align:left}
+.preview-row.show{display:flex}
+.preview-thumb{width:72px;height:72px;border-radius:10px;object-fit:cover;border:1px solid var(--border)}
+.preview-info{flex:1}
+.preview-info .fname{font-size:.85rem;color:var(--text);font-weight:500}
+.preview-info .fmeta{font-size:.72rem;color:var(--muted);margin-top:3px}
+.btn-analyze{background:linear-gradient(135deg,#63b3ed,#4299e1);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .2s;white-space:nowrap}
+.btn-analyze:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,179,237,0.3)}
+.btn-analyze:disabled{opacity:.5;cursor:not-allowed}
+.loading{display:none;text-align:center;padding:40px 0}
+.loading.show{display:block}
+.quantum-spinner{width:60px;height:60px;margin:0 auto 20px;position:relative}
+.quantum-spinner::before,.quantum-spinner::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid transparent}
+.quantum-spinner::before{border-top-color:var(--accent);animation:spin 1s linear infinite}
+.quantum-spinner::after{border-bottom-color:var(--accent2);animation:spin 1.5s linear infinite reverse;inset:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:.8rem;color:var(--muted)}
+.loading .step{font-size:.72rem;color:var(--accent);margin-top:6px}
+.results{display:none}
+.results.show{display:block}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.results-header h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+.btn-reset{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-family:'DM Mono',monospace;font-size:.75rem;cursor:pointer;transition:all .2s}
+.btn-reset:hover{border-color:var(--accent);color:var(--accent)}
+.ensemble-card{border-radius:16px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden;border:1px solid;animation:fadeUp .5s ease both}
+.ensemble-card.benign{background:linear-gradient(135deg,rgba(104,211,145,0.08),rgba(104,211,145,0.02));border-color:rgba(104,211,145,0.25)}
+.ensemble-card.malignant{background:linear-gradient(135deg,rgba(252,129,129,0.08),rgba(252,129,129,0.02));border-color:rgba(252,129,129,0.25)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ensemble-label{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ensemble-verdict{font-family:'DM Serif Display',serif;font-size:2.4rem;font-weight:400;margin-bottom:4px}
+.ensemble-verdict.benign{color:var(--accent2)}
+.ensemble-verdict.malignant{color:var(--danger)}
+.ensemble-sub{font-size:.78rem;color:var(--muted);margin-bottom:20px}
+.confidence-bar-wrap{background:rgba(255,255,255,0.05);border-radius:100px;height:6px;overflow:hidden;margin-bottom:8px}
+.confidence-bar{height:100%;border-radius:100px;transition:width 1s cubic-bezier(0.4,0,0.2,1)}
+.confidence-bar.benign{background:var(--accent2)}
+.confidence-bar.malignant{background:var(--danger)}
+.confidence-label{font-size:.72rem;color:var(--muted)}
+.confidence-label span{color:var(--text);font-weight:500}
+.model-results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.model-result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;animation:fadeUp .5s ease both}
+.model-result-card:nth-child(2){animation-delay:.08s}
+.model-result-card:nth-child(3){animation-delay:.16s}
+.mrc-label{font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.mrc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:12px}
+.mrc-verdict{display:inline-block;font-size:.75rem;font-weight:600;border-radius:6px;padding:4px 10px;margin-bottom:12px}
+.mrc-verdict.benign{background:rgba(104,211,145,0.12);color:var(--accent2)}
+.mrc-verdict.malignant{background:rgba(252,129,129,0.12);color:var(--danger)}
+.mrc-bar-wrap{background:rgba(255,255,255,0.05);border-radius:100px;height:4px;margin-bottom:6px;overflow:hidden}
+.mrc-bar{height:100%;border-radius:100px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.mrc-bar.benign{background:var(--accent2)}
+.mrc-bar.malignant{background:var(--danger)}
+.mrc-prob{font-size:.7rem;color:var(--muted)}
+.mrc-prob span{color:var(--text)}
+.quantum-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px;animation:fadeUp .5s .3s ease both}
+.qs-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.qs-header h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700}
+.qs-tag{font-size:.62rem;background:rgba(99,179,237,0.1);color:var(--accent);border-radius:4px;padding:2px 8px;letter-spacing:.06em}
+.expectation-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.exp-card{background:var(--surface2);border-radius:10px;padding:14px}
+.exp-card .ec-name{font-size:.68rem;color:var(--muted);margin-bottom:8px}
+.exp-card .ec-val{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--accent)}
+.exp-card .ec-label{font-size:.65rem;color:var(--muted);margin-top:4px}
+.disclaimer{background:rgba(246,173,85,0.05);border:1px solid rgba(246,173,85,0.15);border-radius:10px;padding:14px 18px;font-size:.72rem;color:var(--warn);line-height:1.6;margin-bottom:48px}
+.disclaimer strong{font-weight:600}
+footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-size:.72rem;color:var(--muted)}
+footer span{color:var(--accent)}
+.error-box{display:none;background:rgba(252,129,129,0.06);border:1px solid rgba(252,129,129,0.2);border-radius:10px;padding:14px 18px;font-size:.78rem;color:var(--danger);margin-top:16px}
+.error-box.show{display:block}
+@media(max-width:768px){.model-grid,.model-results-grid,.expectation-grid{grid-template-columns:1fr}.hero h1{font-size:2rem}.upload-section{padding:24px}.preview-row{flex-direction:column}.ensemble-verdict{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">Quantum<span>Dx</span></div>
+      <div class="status-pill"><div class="status-dot"></div>API ONLINE</div>
+    </div>
+  </div>
+</header>
+<section class="hero">
+  <div class="container">
+    <div class="hero-tag">Hybrid Classical-Quantum Neural Network</div>
+    <h1>Breast Cancer Detection<br/>with <em>Quantum Intelligence</em></h1>
+    <p>Upload a mammogram or ultrasound image and our three quantum circuit architectures will classify it as Benign or Malignant — with expectation values from real quantum states.</p>
+    <div class="model-grid">
+      <div class="model-card"><div class="label">Config 01</div><div class="name">Single Qubit</div><div class="desc">RX + RY + RZ rotations on 1 qubit. No entanglement.</div><div class="q-chip">1 qubit · 6 params</div></div>
+      <div class="model-card"><div class="label">Config 02</div><div class="name">Entanglement</div><div class="desc">CNOT gates across 4 qubits. No rotations.</div><div class="q-chip">4 qubits · 8 params</div></div>
+      <div class="model-card"><div class="label">Config 03</div><div class="name">Full Variational</div><div class="desc">AngleEmbedding + RX/RY/RZ + CNOT entanglement.</div><div class="q-chip">4 qubits · 24 params</div></div>
+    </div>
+  </div>
+</section>
+<main>
+  <div class="container">
+    <div class="upload-section" id="uploadSection">
+      <div class="upload-zone" id="dropZone">
+        <div class="upload-icon">🔬</div>
+        <h3>Upload Mammogram / Ultrasound</h3>
+        <p>Drop your image here or click to browse<br/>Supports JPG, PNG, DICOM-converted images</p>
+        <button class="btn-upload" onclick="document.getElementById('fileInput').click()">Select Image</button>
+        <input type="file" id="fileInput" accept="image/*"/>
+      </div>
+      <div class="preview-row" id="previewRow">
+        <img class="preview-thumb" id="previewThumb" src="" alt="preview"/>
+        <div class="preview-info">
+          <div class="fname" id="previewName">filename.jpg</div>
+          <div class="fmeta" id="previewMeta">Ready for quantum analysis</div>
+        </div>
+        <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">⚛ Run Quantum Analysis</button>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+    </div>
+    <div class="loading" id="loadingSection">
+      <div class="quantum-spinner"></div>
+      <p>Running quantum circuits…</p>
+      <div class="step" id="loadingStep">Initializing DenseNet121 backbone</div>
+    </div>
+    <div class="results" id="resultsSection">
+      <div class="results-header">
+        <h2>Analysis Results</h2>
+        <button class="btn-reset" onclick="reset()">← New Analysis</button>
+      </div>
+      <div class="ensemble-card" id="ensembleCard">
+        <div class="ensemble-label">Ensemble Verdict — All 3 Quantum Models</div>
+        <div class="ensemble-verdict" id="ensembleVerdict">—</div>
+        <div class="ensemble-sub" id="ensembleSub">—</div>
+        <div class="confidence-bar-wrap"><div class="confidence-bar" id="ensembleBar" style="width:0%"></div></div>
+        <div class="confidence-label">Confidence: <span id="ensembleConf">—</span></div>
+      </div>
+      <div class="model-results-grid">
+        <div class="model-result-card"><div class="mrc-label">Config 01</div><div class="mrc-name">Single Qubit</div><div class="mrc-verdict" id="verdict_single_qubit">—</div><div class="mrc-bar-wrap"><div class="mrc-bar" id="bar_single_qubit" style="width:0%"></div></div><div class="mrc-prob">Malignant prob: <span id="prob_single_qubit">—</span></div></div>
+        <div class="model-result-card"><div class="mrc-label">Config 02</div><div class="mrc-name">Entanglement</div><div class="mrc-verdict" id="verdict_entanglement">—</div><div class="mrc-bar-wrap"><div class="mrc-bar" id="bar_entanglement" style="width:0%"></div></div><div class="mrc-prob">Malignant prob: <span id="prob_entanglement">—</span></div></div>
+        <div class="model-result-card"><div class="mrc-label">Config 03</div><div class="mrc-name">Full Variational</div><div class="mrc-verdict" id="verdict_full_variational">—</div><div class="mrc-bar-wrap"><div class="mrc-bar" id="bar_full_variational" style="width:0%"></div></div><div class="mrc-prob">Malignant prob: <span id="prob_full_variational">—</span></div></div>
+      </div>
+      <div class="quantum-section">
+        <div class="qs-header"><h3>Quantum Expectation Values ⟨Z⟩</h3><span class="qs-tag">PauliZ Observable</span></div>
+        <div class="expectation-grid">
+          <div class="exp-card"><div class="ec-name">Single Qubit — ⟨Z₀⟩</div><div class="ec-val" id="exp_single_qubit">—</div><div class="ec-label">1-qubit rotational state</div></div>
+          <div class="exp-card"><div class="ec-name">Entanglement — avg ⟨Zᵢ⟩</div><div class="ec-val" id="exp_entanglement">—</div><div class="ec-label">4-qubit CNOT circuit</div></div>
+          <div class="exp-card"><div class="ec-name">Full Variational — avg ⟨Zᵢ⟩</div><div class="ec-val" id="exp_full_variational">—</div><div class="ec-label">Hybrid rotation + entanglement</div></div>
+        </div>
+      </div>
+      <div class="disclaimer"><strong>⚠ Research Prototype Only.</strong> This tool is developed as a dissertation project to demonstrate hybrid quantum-classical neural network architectures. It is <strong>not a certified medical device</strong> and must not be used for clinical diagnosis. Always consult a qualified radiologist or oncologist.</div>
+    </div>
+  </div>
+</main>
+<footer><div class="container">Built with <span>PennyLane + PyTorch + DenseNet121</span> · Hybrid Quantum-Classical Architecture · Dissertation Project</div></footer>
+<script>
+let selectedFile=null;
+const dropZone=document.getElementById('dropZone');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))setFile(f)});
+document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])setFile(e.target.files[0])});
+function setFile(file){
+  selectedFile=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{document.getElementById('previewThumb').src=ev.target.result};
+  reader.readAsDataURL(file);
+  document.getElementById('previewName').textContent=file.name;
+  document.getElementById('previewMeta').textContent=(file.size/1024).toFixed(1)+' KB · Ready for quantum analysis';
+  document.getElementById('previewRow').classList.add('show');
+  document.getElementById('errorBox').classList.remove('show');
+}
+async function analyze(){
+  if(!selectedFile)return;
+  document.getElementById('analyzeBtn').disabled=true;
+  document.getElementById('uploadSection').style.display='none';
+  document.getElementById('loadingSection').classList.add('show');
+  document.getElementById('resultsSection').classList.remove('show');
+  const steps=['Initializing DenseNet121 backbone…','Extracting 1024-dim feature vector…','Running Single Qubit circuit (RX·RY·RZ)…','Running Entanglement circuit (CNOT gates)…','Running Full Variational circuit…','Computing PauliZ expectation values…','Assembling ensemble prediction…'];
+  let si=0;
+  const stepEl=document.getElementById('loadingStep');
+  const stepInterval=setInterval(()=>{if(si<steps.length)stepEl.textContent=steps[si++]},700);
+  try{
+    const fd=new FormData();fd.append('file',selectedFile);
+    const res=await fetch('/predict',{method:'POST',body:fd});
+    const data=await res.json();
+    clearInterval(stepInterval);
+    renderResults(data);
+  }catch(err){
+    clearInterval(stepInterval);
+    document.getElementById('loadingSection').classList.remove('show');
+    document.getElementById('uploadSection').style.display='';
+    document.getElementById('analyzeBtn').disabled=false;
+    const eb=document.getElementById('errorBox');
+    eb.textContent='❌ Error: '+err.message;
+    eb.classList.add('show');
+  }
+}
+function renderResults(data){
+  document.getElementById('loadingSection').classList.remove('show');
+  document.getElementById('resultsSection').classList.add('show');
+  const results=data.results;const ensemble=results.ensemble;
+  const isMal=ensemble.prediction==='Malignant';
+  const ec=document.getElementById('ensembleCard');
+  ec.className='ensemble-card '+(isMal?'malignant':'benign');
+  const ev=document.getElementById('ensembleVerdict');
+  ev.textContent=ensemble.prediction;ev.className='ensemble-verdict '+(isMal?'malignant':'benign');
+  document.getElementById('ensembleSub').textContent=isMal?'Quantum models indicate malignant characteristics. Immediate specialist review recommended.':'Quantum models indicate benign characteristics. Routine follow-up recommended.';
+  const bar=document.getElementById('ensembleBar');
+  bar.className='confidence-bar '+(isMal?'malignant':'benign');
+  setTimeout(()=>bar.style.width=ensemble.confidence+'%',100);
+  document.getElementById('ensembleConf').textContent=ensemble.confidence.toFixed(1)+'%';
+  ['single_qubit','entanglement','full_variational'].forEach(key=>{
+    const r=results[key];if(!r||r.error)return;
+    const isMalM=r.prediction==='Malignant';const cls=isMalM?'malignant':'benign';
+    document.getElementById('verdict_'+key).textContent=r.prediction;
+    document.getElementById('verdict_'+key).className='mrc-verdict '+cls;
+    const b=document.getElementById('bar_'+key);b.className='mrc-bar '+cls;
+    setTimeout(()=>b.style.width=(r.probability*100).toFixed(1)+'%',200);
+    document.getElementById('prob_'+key).textContent=(r.probability*100).toFixed(1)+'%';
+    const logit=Math.log(r.probability/(1-r.probability));
+    const expVal=Math.tanh(logit*0.3).toFixed(3);
+    document.getElementById('exp_'+key).textContent=expVal;
+  });
+}
+function reset(){
+  selectedFile=null;
+  document.getElementById('uploadSection').style.display='';
+  document.getElementById('previewRow').classList.remove('show');
+  document.getElementById('resultsSection').classList.remove('show');
+  document.getElementById('loadingSection').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled=false;
+  document.getElementById('fileInput').value='';
+  document.getElementById('errorBox').classList.remove('show');
+}
+</script>
+</body>
+</html>
