@@ -1,0 +1,219 @@
+# 🧬 Explainable Noise-Resilient Quantum Neural Networks for Breast Cancer Detection
+
+<p align="center">
+Hybrid Classical-Quantum Deep Learning System for Mammogram Classification
+</p>
+
+<p align="center">
+<img src="assets/demo.png" width="800">
+</p>
+
+---
+
+## 🚀 Live Demo
+
+🌐 https://explainable-noise-resilient-quantum.onrender.com
+
+<img width="1265" height="726" alt="Screenshot 2026-03-07 163459" src="https://github.com/user-attachments/assets/cb580ac3-4cdd-4127-8e2e-c0c7a5bad697" />
+
+<img width="1083" height="714" alt="Screenshot 2026-03-07 163848" src="https://github.com/user-attachments/assets/606e513c-2b0f-434e-879d-9b06d840eace" />
+
+<img width="1091" height="781" alt="Screenshot 2026-03-07 164134" src="https://github.com/user-attachments/assets/867dac2e-38e5-4109-aaac-d62fc8655101" />
+
+
+
+
+
+
+---
+
+## 🧠 Research Goal
+
+Most deep learning systems for cancer detection behave as **black boxes** — they output predictions but do not explain how the decision was made.
+
+This research explores whether **quantum circuits can extract interpretable diagnostic features** from mammogram images.
+
+The system integrates a **classical CNN feature extractor** with **quantum variational circuits** and studies their performance under **realistic quantum noise conditions**.
+
+---
+
+## 🏗 System Architecture
+
+<p align="center">
+<img src="assets/architecture.png" width="700">
+</p>
+
+Pipeline:
+
+```
+Mammogram Image
+        ↓
+DenseNet121 Feature Extractor
+        ↓
+Feature Compression Layer
+        ↓
+Quantum Circuit Layer
+        ↓
+Quantum Expectation Values ⟨Z⟩
+        ↓
+Final Classifier
+        ↓
+Benign / Malignant
+```
+
+---
+
+## 🔬 Quantum Circuit Configurations
+
+Three architectures are tested to study quantum contribution.
+
+### 1️⃣ Single Qubit Rotation Model
+
+• Qubits: 1
+• Gates: RX, RY, RZ
+• Entanglement: None
+
+Purpose: Evaluate minimal quantum representation.
+
+---
+
+### 2️⃣ Entanglement-Only Model
+
+• Qubits: 4
+• Gates: Hadamard + PhaseShift + CNOT
+• No rotational gates
+
+Purpose: Measure diagnostic signal from **pure quantum correlation**.
+
+---
+
+### 3️⃣ Full Variational Quantum Circuit
+
+• Qubits: 4
+• Gates: RX, RY, RZ + CNOT
+• 2 variational layers
+
+Purpose: Maximum quantum expressibility.
+
+---
+
+## 🧪 Noise Robustness Study
+
+The model is evaluated under **four quantum noise channels**.
+
+| Noise Type        | Description         |
+| ----------------- | ------------------- |
+| Depolarizing      | Random Pauli errors |
+| Bit Flip          | Qubit state flip    |
+| Phase Flip        | Phase inversion     |
+| Amplitude Damping | Energy decay        |
+
+Noise probabilities tested:
+
+```
+p = 0.01
+p = 0.05
+p = 0.10
+```
+
+This ensures the model is viable on **NISQ-era quantum hardware**.
+
+---
+
+## 📊 Model Output Example
+
+```json
+{
+ "results": {
+  "single_qubit": {"prediction": "Benign", "confidence": 94.4},
+  "entanglement": {"prediction": "Benign", "confidence": 93.1},
+  "full_variational": {"prediction": "Benign", "confidence": 84.6},
+  "ensemble": {"prediction": "Benign", "confidence": 90.7}
+ }
+}
+```
+
+---
+
+## 🛠 Tech Stack
+
+| Component         | Technology  |
+| ----------------- | ----------- |
+| Quantum Framework | PennyLane   |
+| Deep Learning     | PyTorch     |
+| CNN Backbone      | DenseNet121 |
+| API Backend       | FastAPI     |
+| Deployment        | Render      |
+| Containerization  | Docker      |
+
+---
+
+## 📂 Project Structure
+
+```
+quantum-api/
+
+app.py
+quantum_models.py
+requirements.txt
+Dockerfile
+
+models/
+ ├── single_qubit_best.pth
+ ├── entanglement_best.pth
+ └── full_variational_best.pth
+
+static/
+ └── index.html
+
+assets/
+ ├── demo.png
+ ├── architecture.png
+ └── prediction.png
+```
+
+---
+
+## ⚙️ Run Locally
+
+```
+git clone https://github.com/YOUR_USERNAME/quantum-breast-cancer-api.git
+
+cd quantum-breast-cancer-api
+
+pip install -r requirements.txt
+
+uvicorn app:app --reload
+```
+
+Open:
+
+```
+http://localhost:8000
+```
+
+---
+
+## 🏋 Training Configuration
+
+| Parameter         | Value         |
+| ----------------- | ------------- |
+| Dataset           | CBIS-DDSM     |
+| Image Size        | 224 × 224     |
+| Epochs            | 20            |
+| Optimizer         | Adam          |
+| Loss              | BCEWithLogits |
+| Training Platform | Kaggle GPU    |
+
+---
+
+## ⚠ Disclaimer
+
+This system is developed **only for academic research purposes** and should not be used for clinical diagnosis.
+
+---
+
+## 👨‍💻 Author
+
+MSc Data Science Dissertation
+Hybrid Classical-Quantum Neural Networks for Medical Imaging
