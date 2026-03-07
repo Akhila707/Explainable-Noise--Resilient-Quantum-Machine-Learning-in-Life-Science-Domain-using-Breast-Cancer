@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: quantum-cancer-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
