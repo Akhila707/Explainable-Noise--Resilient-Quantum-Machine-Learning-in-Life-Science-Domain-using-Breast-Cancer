@@ -1,107 +1,60 @@
-🧬 Explainable Noise-Resilient Quantum Neural Networks for Breast Cancer Detection
-<p align="center"> Hybrid Classical–Quantum Deep Learning System for Mammogram Classification </p> <p align="center"> <img src="assets/demo.png" width="850"/> </p>
-🌐 Live Demo
+# 🧬 Explainable Noise-Resilient Quantum Neural Networks for Breast Cancer Detection
+
+<p align="center">
+Hybrid Classical–Quantum Deep Learning System for Mammogram Classification
+</p>
+
+<p align="center">
+<img src="assets/demo.png" width="850"/>
+</p>
+
+---
+
+## 🌐 Live Demo
 
 🔗 https://explainable-noise-resilient-quantum.onrender.com
 
-Upload a mammogram image to evaluate predictions from three quantum neural network architectures and their ensemble output.
+Upload a mammogram image to evaluate predictions from **three quantum neural network architectures** and their ensemble output.
 
-📌 Abstract
+---
 
-Deep learning models for cancer detection often behave as black-box systems, providing predictions without insight into the underlying decision-making process.
+## 📌 Abstract
 
-This research proposes a Hybrid Classical–Quantum Neural Network (HQNN) framework that integrates:
+Deep learning models for cancer detection often behave as **black-box systems**, providing predictions without insight into the underlying decision-making process.
 
-DenseNet121 for classical feature extraction
+This research proposes a **Hybrid Classical–Quantum Neural Network (HQNN)** framework that integrates:
 
-Variational Quantum Circuits (VQCs) for quantum feature processing
+- DenseNet121 for classical feature extraction  
+- Variational Quantum Circuits (VQCs) for quantum feature processing  
+- Noise simulation to evaluate robustness on NISQ-era quantum hardware  
 
-Noise simulation to evaluate robustness on NISQ-era quantum hardware
+The system investigates whether **quantum circuits can learn interpretable diagnostic features from mammography images** while maintaining performance under realistic quantum noise.
 
-The system investigates whether quantum circuits can learn interpretable diagnostic features from mammography images while maintaining performance under realistic quantum noise.
+---
 
-🧠 Research Objectives
+## 🧠 Research Objectives
 
 This project aims to:
 
-• Explore quantum-enhanced feature learning for medical imaging
-• Evaluate quantum circuit interpretability
-• Study noise robustness in NISQ devices
-• Compare multiple quantum neural network architectures
+- Explore quantum-enhanced feature learning for medical imaging
+- Evaluate quantum circuit interpretability
+- Study noise robustness in NISQ devices
+- Compare multiple quantum neural network architectures
 
-🏗 System Architecture
-<p align="center"> <img src="assets/architecture.png" width="720"/> </p>
-Processing Pipeline
+## System architecture
+
+Pipeline:
+
 Mammogram Image
-      ↓
+        ↓
 DenseNet121 Feature Extractor
-      ↓
+        ↓
 Feature Compression Layer
-      ↓
+        ↓
 Quantum Circuit Layer
-      ↓
+        ↓
 Quantum Expectation Values ⟨Z⟩
-      ↓
+        ↓
 Final Classifier
-      ↓
+        ↓
 Benign / Malignant
-🔬 Quantum Neural Network Architectures
-
-Three quantum circuit configurations are implemented to analyze the contribution of quantum components.
-
-1️⃣ Single-Qubit Rotation Model
-
-Configuration
-
-Parameter	Value
-Qubits	1
-Gates	RX, RY, RZ
-Entanglement	None
-
-Purpose
-
-Evaluate the performance of minimal quantum representation.
-
-2️⃣ Entanglement-Only Model
-
-Configuration
-
-Parameter	Value
-Qubits	4
-Gates	Hadamard, PhaseShift, CNOT
-Rotational Gates	None
-
-Purpose
-
-Analyze diagnostic information extracted purely from quantum correlations.
-
-3️⃣ Full Variational Quantum Circuit
-
-Configuration
-
-Parameter	Value
-Qubits	4
-Gates	RX, RY, RZ + CNOT
-Variational Layers	2
-
-Purpose
-
-Provide maximum quantum expressibility through parameterized circuits.
-
-⚡ Quantum Noise Robustness Study
-
-To simulate realistic quantum hardware, the models are evaluated under four noise channels.
-
-Noise Channel	Description
-Depolarizing	Random Pauli errors
-Bit Flip	Qubit state inversion
-Phase Flip	Phase inversion
-Amplitude Damping	Energy decay
-
-Noise levels tested:
-
-p = 0.01
-p = 0.05
-p = 0.10
-
-This evaluates the viability of the system on NISQ (Noisy Intermediate-Scale Quantum) devices.
